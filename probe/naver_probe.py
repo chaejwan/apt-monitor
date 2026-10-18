@@ -213,8 +213,14 @@ def browser_checks(complex_no: str) -> None:
         # 화면이 POST로 부르는 API는 요청 본문과 헤더를 함께 남겨, 나중에 같은 요청을 다시 보냅니다.
         posts: list[dict] = []
 
+        replaying = [False]
+
         def on_request(req):
-            if "front-api" in req.url and req.method == "POST" and "/user/" not in req.url:
+            # 진단이 직접 다시 보내는 요청은 기록하지 않습니다 (기록하면 목록이 끝없이 늘어남).
+            if replaying[0]:
+                return
+            if "front-api" in req.url and req.method == "POST" and "/user/" not in req.url \
+                    and "telemetry" not in req.url:
                 headers = {k: v for k, v in req.headers.items()
                            if k.lower() not in ("cookie", "content-length", "host") and not k.startswith(":")}
                 posts.append({"url": req.url, "body": req.post_data or "", "headers": headers})
@@ -274,7 +280,10 @@ def browser_checks(complex_no: str) -> None:
                                                     encoding="utf-8")
                 out("| 상태 | 크기 | 주소 | 요청 본문 | 내용 | 원문 |")
                 out("|---|---|---|---|---|---|")
-                for i, req in enumerate(posts):
+                replaying[0] = True
+                # 같은 주소·본문은 한 번만, 최대 10개까지만 다시 보냅니다.
+                unique = list({(r["url"], r["body"]): r for r in posts}.values())[:10]
+                for i, req in enumerate(unique):
                     res = page.evaluate(
                         "async ([u, b, h]) => { const r = await fetch(u, {method: 'POST', body: b,"
                         " headers: h, credentials: 'include'}); return [r.status, await r.text()]; }",
