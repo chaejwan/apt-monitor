@@ -68,6 +68,9 @@ def describe(body: bytes, ctype: str) -> str:
             for k in ("articleList", "result", "body", "items"):
                 if isinstance(data.get(k), list):
                     extra = f", {k} {len(data[k])}건"
+                elif isinstance(data.get(k), dict):
+                    inner = {ik: len(iv) for ik, iv in data[k].items() if isinstance(iv, list)}
+                    extra = f", {k} keys={list(data[k])[:8]} 목록={inner}"
             return f"keys={keys}{extra}"
         if isinstance(data, list):
             return f"list {len(data)}건"
@@ -207,6 +210,16 @@ def browser_checks(complex_no: str) -> None:
         seen: list[tuple[str, int, str]] = []
         ctx.on("response", lambda r: seen.append((r.request.method, r.status, r.url))
                if "front-api" in r.url else None)
+        # 화면이 POST로 부르는 API는 요청 본문과 헤더를 함께 남겨, 나중에 같은 요청을 다시 보냅니다.
+        posts: list[dict] = []
+
+        def on_request(req):
+            if "front-api" in req.url and req.method == "POST" and "/user/" not in req.url:
+                headers = {k: v for k, v in req.headers.items()
+                           if k.lower() not in ("cookie", "content-length", "host") and not k.startswith(":")}
+                posts.append({"url": req.url, "body": req.post_data or "", "headers": headers})
+
+        ctx.on("request", on_request)
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         try:
             resp = page.goto(MAP_URL, wait_until="domcontentloaded", timeout=45_000)
@@ -241,7 +254,9 @@ def browser_checks(complex_no: str) -> None:
                 out()
                 out("| 상태 | 크기 | 주소 | 내용 | 원문 |")
                 out("|---|---|---|---|---|")
-                for i, path in enumerate(IN_PAGE_APIS):
+                extra = ["/front-api/v1/complex/buildingList?complexNumber={c}",
+                         "/front-api/v1/complex/mapComplexSummaryInfo?complexNumber={c}"]
+                for i, path in enumerate(IN_PAGE_APIS[:5] + extra):
                     url = path.format(c=complex_no)
                     res = page.evaluate(
                         "async (u) => { const r = await fetch(u, {credentials: 'include'});"
@@ -249,6 +264,25 @@ def browser_checks(complex_no: str) -> None:
                     body = res[1].encode("utf-8")
                     sample = save_sample(f"inpage_{i}.json", body)
                     out(f"| {res[0]} | {len(body)} | `{urllib.parse.unquote(url)[:120]}` | "
+                        f"{describe(body, 'json')[:140]} | {sample} |")
+                    page.wait_for_timeout(700)
+                out()
+
+                out("### 화면이 POST로 부른 API를 같은 본문으로 다시 호출")
+                out()
+                (SAMPLES / "posts.json").write_text(json.dumps(posts, ensure_ascii=False, indent=1),
+                                                    encoding="utf-8")
+                out("| 상태 | 크기 | 주소 | 요청 본문 | 내용 | 원문 |")
+                out("|---|---|---|---|---|---|")
+                for i, req in enumerate(posts):
+                    res = page.evaluate(
+                        "async ([u, b, h]) => { const r = await fetch(u, {method: 'POST', body: b,"
+                        " headers: h, credentials: 'include'}); return [r.status, await r.text()]; }",
+                        [req["url"], req["body"], req["headers"]])
+                    body = res[1].encode("utf-8")
+                    sample = save_sample(f"post_{i}.json", body)
+                    short = req["url"].replace("https://fin.land.naver.com", "")
+                    out(f"| {res[0]} | {len(body)} | `{short}` | `{req['body'][:300]}` | "
                         f"{describe(body, 'json')[:140]} | {sample} |")
                     page.wait_for_timeout(700)
                 out()
