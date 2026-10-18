@@ -264,9 +264,12 @@ def browser_checks(complex_no: str) -> None:
                          "/front-api/v1/complex/mapComplexSummaryInfo?complexNumber={c}"]
                 for i, path in enumerate(IN_PAGE_APIS[:5] + extra):
                     url = path.format(c=complex_no)
-                    res = page.evaluate(
-                        "async (u) => { const r = await fetch(u, {credentials: 'include'});"
+                    try:
+                        res = page.evaluate(
+                        "async (u) => { const r = await fetch(u, {credentials: 'include', signal: AbortSignal.timeout(15000)});"
                         " return [r.status, await r.text()]; }", url)
+                    except Exception as e:
+                        res = [0, f"호출 실패: {str(e)[:80]}"]
                     body = res[1].encode("utf-8")
                     sample = save_sample(f"inpage_{i}.json", body)
                     out(f"| {res[0]} | {len(body)} | `{urllib.parse.unquote(url)[:120]}` | "
@@ -284,10 +287,13 @@ def browser_checks(complex_no: str) -> None:
                 # 같은 주소·본문은 한 번만, 최대 10개까지만 다시 보냅니다.
                 unique = list({(r["url"], r["body"]): r for r in posts}.values())[:10]
                 for i, req in enumerate(unique):
-                    res = page.evaluate(
+                    try:
+                        res = page.evaluate(
                         "async ([u, b, h]) => { const r = await fetch(u, {method: 'POST', body: b,"
-                        " headers: h, credentials: 'include'}); return [r.status, await r.text()]; }",
+                        " headers: h, credentials: 'include', signal: AbortSignal.timeout(15000)}); return [r.status, await r.text()]; }",
                         [req["url"], req["body"], req["headers"]])
+                    except Exception as e:
+                        res = [0, f"호출 실패: {str(e)[:80]}"]
                     body = res[1].encode("utf-8")
                     sample = save_sample(f"post_{i}.json", body)
                     short = req["url"].replace("https://fin.land.naver.com", "")
