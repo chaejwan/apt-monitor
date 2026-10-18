@@ -1,0 +1,179 @@
+{"url": "https://api.kbland.kr/land-complex/complex/complexMain?%EB%8B%A8%EC%A7%80%EA%B8%B0%EB%B3%B8%EC%9D%BC%EB%A0%A8%EB%B2%88%ED%98%B8=4637", "method": "GET", "post": ""}
+{
+  "dataHeader": {
+    "resultCode": "10000",
+    "message": "NO_ERROR"
+  },
+  "dataBody": {
+    "data": {
+      "kms개발사업번호": 0,
+      "최대계약면적": 265.1120,
+      "단지기본일련번호": 4637,
+      "신주소": "경기도 성남시 분당구 수내로 148",
+      "월세건수": 3,
+      "data": [
+        {
+          "순번": 1,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDg5NzI=.jpg"
+        },
+        {
+          "순번": 1,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDkxNzI=.jpg"
+        },
+        {
+          "순번": 1,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDkyNzI=.jpg"
+        },
+        {
+          "순번": 2,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDg4NzI=.jpg"
+        },
+        {
+          "순번": 3,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDk1NzI=.jpg"
+        },
+        {
+          "순번": 10,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MTAwNzI=.jpg"
+        },
+        {
+          "순번": 10,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDk5NzI=.jpg"
+        },
+        {
+          "순번": 12,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDkzNzI=.jpg"
+        },
+        {
+          "순번": 12,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDk2NzI=.jpg"
+        },
+        {
+          "순번": 13,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDk0NzI=.jpg"
+        },
+        {
+          "순번": 15,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDk3NzI=.jpg"
+        },
+        {
+          "순번": 16,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDE0MDk4NzI=.jpg"
+        },
+        {
+          "순번": 20,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDUwNDU5NzI=.jpg"
+        },
+        {
+          "순번": 20,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDUwNDU4NzI=.jpg"
+        },
+        {
+          "순번": 20,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjk2NzI=.jpg"
+        },
+        {
+          "순번": 20,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjk1NzI=.jpg"
+        },
+        {
+          "순번": 20,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjk0NzI=.jpg"
+        },
+        {
+          "순번": 21,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjkxNzI=.jpg"
+        },
+        {
+          "순번": 21,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjkwNzI=.jpg"
+        },
+        {
+          "순번": 21,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjg5NzI=.jpg"
+        },
+        {
+          "순번": 21,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjg4NzI=.jpg"
+        },
+        {
+          "순번": 21,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjg2NzI=.jpg"
+        },
+        {
+          "순번": 22,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjg3NzI=.jpg"
+        },
+        {
+          "순번": 24,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjkyNzI=.jpg"
+        },
+        {
+          "순번": 24,
+          "전체이미지경로_800": "https://file.kbland.kr/image/kbstar/land/img/alian/kms/complex/photo/objctidnfr/5340/NTM0MDEwMDMwNjkzNzI=.jpg"
+        }
+      ],
+      "최저층수": 12,
+      "regulList": [
+        {
+          "규제명": "투기과열지구",
+          "규제일련번호": 593,
+          "법정동코드": "4113510200",
+          "개발사업일련번호": null,
+          "규제기준일련번호": 2
+        },
+        {
+          "규제명": "조정대상지역",
+          "규제일련번호": 593,
+          "법정동코드": "4113510200",
+          "개발사업일련번호": null,
+          "규제기준일련번호": 3
+        },
+        {
+          "규제명": "과밀억제지역",
+          "규제일련번호": 593,
+          "법정동코드": "4113510200",
+          "개발사업일련번호": null,
+          "규제기준일련번호": 4
+        }
+      ],
+      "임대세대수": 0,
+      "시공사명": "서안건설(주)",
+      "최대전용면적": 191.5200,
+      "매물종별구분명": "아파트",
+      "wgs84경도": "127.1228997",
+      "최대공급면적": 229.4710,
+      "wgs84위도": "37.3720063",
+      "전세건수": 1,
+      "최소계약면적": 88.6170,
+      "준공년월일": "19930527",
+      "단지명": "파크타운(서안)",
+      "최소공급면적": 77.5770,
+      "호실정보존재여부": 1,
+      "구주소": "경기도 성남시 분당구 수내동 52",
+      "매물종별구분": "01",
+      "입주년월": "199305",
+      "재건축여부": "0",
+      "난방연료구분명": "열병합",
+      "난방방식구분명": "지역난방",
+      "총동수": 10,
+      "법정동코드": "4113510200",
+      "현관구조": "계단식, 복도식",
+      "용적률내용": 211.0,
+      "매매건수": 13,
+      "최소전용면적": 59.3200,
+      "대표면적일련번호": 172014,
+      "세대당주차대수비율": 2.00,
+      "건폐율내용": 16.0,
+      "관리사무소전화번호내용": "031-711-9644",
+      "준공년수": 34.0,
+      "읍면동명": "수내동",
+      "총세대수": 798,
+      "최고층수": 30,
+      "준공년월": "1993.05",
+      "총주차대수": 1598,
+      "건물최고층수": 30
+    },
+    "resultCode": 11000
+  }
+}
