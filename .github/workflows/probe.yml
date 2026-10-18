@@ -1,0 +1,56 @@
+name: 수집 진단
+
+# GitHub Actions 환경에서 네이버부동산·국토부 API가 응답하는지 확인합니다.
+# Actions 탭 → 수집 진단 → Run workflow 에서 단지번호를 넣고 실행하면,
+# 결과가 실행 화면 요약에 표시되고 probe/report.md 로 저장소에도 기록됩니다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      complex_no:
+        description: "네이버 단지번호 (네이버부동산 단지 주소의 /complexes/ 뒤 숫자)"
+        required: true
+      browser:
+        description: "브라우저로 렌더링해서 실제로 쓰이는 API까지 찾기"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-commit
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 내려받기
+        uses: actions/checkout@v4
+
+      - name: 파이썬 준비
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 브라우저 설치
+        if: ${{ inputs.browser }}
+        run: |
+          pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+
+      - name: 진단
+        env:
+          MOLIT_API_KEY: ${{ secrets.MOLIT_API_KEY }}
+        run: |
+          rm -rf probe/samples
+          python3 probe/naver_probe.py --complex "${{ inputs.complex_no }}" ${{ inputs.browser && '--browser' || '' }}
+
+      - name: 결과 기록
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add probe/report.md probe/samples
+          git diff --cached --quiet || git commit -m "수집 진단 결과 갱신 [skip ci]"
+          git push
