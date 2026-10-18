@@ -163,109 +163,104 @@ def http_checks(complex_no: str) -> None:
     out()
 
 
+# 사용자가 평소 브라우저에서 연 파크타운 지도 주소 (layer 값에 단지가 들어 있음)
+MAP_URL = ("https://fin.land.naver.com/map?tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer="
+           "NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYCWDrEArnV0l12ODutYxAXSA")
+
+# 페이지 안에서 직접 부를 API. {c} 는 단지번호. 매물 목록은 이름을 몰라 후보를 여럿 시도합니다.
+IN_PAGE_APIS = [
+    "/front-api/v1/complex/article/stats?complexNumber={c}",
+    "/front-api/v1/complex/pyeongList?complexNumber={c}",
+    "/front-api/v1/complex/pyeongGroups?complexNumber={c}",
+    "/front-api/v1/complex/asking-price?complexNumber={c}&pyeongTypeNumber=0&realEstateType=A01&tradeType=A1",
+    "/front-api/v1/complex?complexNumber={c}",
+    "/front-api/v1/complex/article/list?complexNumber={c}&tradeTypes[]=A1&page=0&size=30",
+    "/front-api/v1/complex/article/list?complexNumber={c}&tradeType=A1&page=0&size=30",
+    "/front-api/v1/complex/articles?complexNumber={c}&tradeType=A1&page=0&size=30",
+    "/front-api/v1/article/list?complexNumber={c}&tradeType=A1&page=0&size=30",
+    "/front-api/v1/complex/article/v2/list?complexNumber={c}&tradeType=A1&page=0&size=30",
+]
+
+
 def browser_checks(complex_no: str) -> None:
     out("## 2. 브라우저 렌더링 중 오간 JSON 응답")
     out()
     from playwright.sync_api import sync_playwright
 
-    # new.land 는 /404 로 넘어가므로 현재 서비스인 fin.land 만 확인합니다.
-    page_url = f"https://fin.land.naver.com/complexes/{complex_no}"
     SAMPLES.mkdir(parents=True, exist_ok=True)
+    profile = HERE.parent / "laptop" / ".browser-profile"
     with sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=os.environ.get("CHROMIUM_PATH") or None,
-                                    headless=os.environ.get("HEADED") != "1")
-        ctx = browser.new_context(user_agent=UA, locale="ko-KR", timezone_id="Asia/Seoul",
-                                  viewport={"width": 1400, "height": 900})
-        responses = []
-        auth_headers: set[str] = set()
-
-        def on_request(req):
-            h = req.headers.get("authorization")
-            if h:
-                auth_headers.add(f"{urllib.parse.urlparse(req.url).netloc} → {h[:20]}…")
-
-        # 동기 모드에서는 이벤트 처리 중에 응답 원문을 읽을 수 없어, 응답 객체만 모아 두고 나중에 읽습니다.
-        def on_response(resp):
-            if "front-api" in resp.url or "json" in resp.headers.get("content-type", ""):
-                responses.append(resp)
-
-        page = ctx.new_page()
-        page.on("request", on_request)
-        page.on("response", on_response)
-        out(f"### {page_url}")
-        out()
+        # 자동화 브라우저로 보이면 네이버가 404로 돌려보내므로, 설치된 Chrome을 자동화 표시 없이 띄웁니다.
+        opts = dict(headless=os.environ.get("HEADED") != "1", locale="ko-KR", timezone_id="Asia/Seoul",
+                    viewport={"width": 1400, "height": 900},
+                    args=["--disable-blink-features=AutomationControlled"],
+                    ignore_default_args=["--enable-automation"])
         try:
-            resp = page.goto(page_url, wait_until="domcontentloaded", timeout=45_000)
-            out(f"- 페이지 상태: {resp.status if resp else '응답 없음'}, 최종 주소: {page.url[:120]}")
-            page.wait_for_timeout(8000)
-            page.screenshot(path=str(SAMPLES / "browser_1_단지.png"))
-            # 화면 위쪽 '매매 55' 같은 탭을 눌러 매물 목록을 엽니다.
-            for pattern in (r"^매매\s*\d+$", r"^매물$"):
-                try:
-                    page.get_by_text(re.compile(pattern)).first.click(timeout=4000)
-                    out(f"- '{pattern}' 클릭 → 주소 {page.url[:120]}")
-                    page.wait_for_timeout(5000)
-                    break
-                except Exception as e:
-                    out(f"- '{pattern}' 클릭 실패: {str(e)[:80]}")
-            page.screenshot(path=str(SAMPLES / "browser_2_매물.png"))
-            # 목록 패널 위에서만 스크롤해 다음 페이지를 불러옵니다.
-            page.mouse.move(250, 650)
-            for _ in range(4):
-                page.mouse.wheel(0, 1500)
-                page.wait_for_timeout(1500)
-            page.screenshot(path=str(SAMPLES / "browser_3_스크롤.png"))
+            ctx = p.chromium.launch_persistent_context(str(profile), channel="chrome", **opts)
+            out("- 브라우저: 설치된 Chrome")
+        except Exception as e:
+            out(f"- 설치된 Chrome 실행 실패({str(e)[:60]}), 내장 Chromium 사용")
+            ctx = p.chromium.launch_persistent_context(
+                str(profile), executable_path=os.environ.get("CHROMIUM_PATH") or None, **opts)
+        ctx.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+        seen: list[tuple[str, int, str]] = []
+        ctx.on("response", lambda r: seen.append((r.request.method, r.status, r.url))
+               if "front-api" in r.url else None)
+        page = ctx.pages[0] if ctx.pages else ctx.new_page()
+        try:
+            resp = page.goto(MAP_URL, wait_until="domcontentloaded", timeout=45_000)
+            out(f"- 지도 페이지 상태: {resp.status if resp else '응답 없음'}")
+            for sec in (3, 8):
+                page.wait_for_timeout(sec * 1000 - (3000 if sec == 8 else 0))
+                out(f"- {sec}초 뒤 주소: {page.url[:110]}")
+            page.screenshot(path=str(SAMPLES / "browser_1_지도.png"))
+            ok = "fin.land.naver.com" in page.url
+            out(f"- 404로 넘어갔는지: {'아니오(정상)' if ok else '예'}")
+            out()
+
+            if ok:
+                # 매매 탭 클릭으로 화면이 부르는 매물 목록 API를 잡아 봅니다.
+                for loc in (page.get_by_text(re.compile(r"^매매\s*\d+$")),
+                            page.locator("text=/^매매/").filter(has_text=re.compile(r"\d")),
+                            page.get_by_role("tab", name=re.compile("매물")),
+                            page.get_by_text("매물", exact=True)):
+                    try:
+                        loc.first.click(timeout=3000)
+                        page.wait_for_timeout(4000)
+                        out(f"- 매물 탭 클릭 성공 → {page.url[:110]}")
+                        break
+                    except Exception:
+                        continue
+                else:
+                    out("- 매물 탭 클릭 실패")
+                page.screenshot(path=str(SAMPLES / "browser_2_매물.png"))
+                out()
+
+                out("### 페이지 안에서 직접 부른 API")
+                out()
+                out("| 상태 | 크기 | 주소 | 내용 | 원문 |")
+                out("|---|---|---|---|---|")
+                for i, path in enumerate(IN_PAGE_APIS):
+                    url = path.format(c=complex_no)
+                    res = page.evaluate(
+                        "async (u) => { const r = await fetch(u, {credentials: 'include'});"
+                        " return [r.status, await r.text()]; }", url)
+                    body = res[1].encode("utf-8")
+                    sample = save_sample(f"inpage_{i}.json", body)
+                    out(f"| {res[0]} | {len(body)} | `{urllib.parse.unquote(url)[:120]}` | "
+                        f"{describe(body, 'json')[:140]} | {sample} |")
+                    page.wait_for_timeout(700)
+                out()
         except Exception as e:
             out(f"- 진행 중 실패: {str(e)[:200]}")
-        out(f"- Authorization 헤더를 쓴 요청: {sorted(auth_headers) or '없음'}")
-        out()
+            out()
+        ctx.close()
 
-        rows = []
-        for i, r in enumerate(responses):
-            try:
-                body = r.body()
-                err = ""
-            except Exception as e:
-                body, err = b"", str(e)[:60]
-            req = r.request
-            rows.append({"i": i, "url": r.url, "status": r.status, "method": req.method,
-                         "post": (req.post_data or "")[:2000], "headers": dict(req.headers), "body": body,
-                         "desc": describe(body, r.headers.get("content-type", "")) if body else f"원문 없음 {err}"})
-        page.close()
-        browser.close()
-
-    out("| # | 방식 | 상태 | 크기 | 주소(쿼리 포함) | 내용 |")
-    out("|---|---|---|---|---|---|")
-    for r in rows:
-        if "land.naver.com" not in r["url"]:
-            continue
-        url = urllib.parse.unquote(r["url"]).replace("https://fin.land.naver.com", "")
-        out(f"| {r['i']} | {r['method']} | {r['status']} | {len(r['body'])} | `{url[:220]}` | {r['desc'][:150]} |")
-        if r["body"]:
-            save_sample(f"browser_{r['i']}.json", r["body"])
-        headers = {k: v for k, v in r["headers"].items() if k.lower() != "cookie"}
-        (SAMPLES / f"browser_{r['i']}.req.json").write_text(json.dumps(
-            {"url": r["url"], "method": r["method"], "post": r["post"], "headers": headers},
-            ensure_ascii=False, indent=1), encoding="utf-8")
+    out("### 화면이 스스로 부른 API (주소만)")
     out()
-
-    # 브라우저 없이 같은 주소를 일반 HTTP로 다시 불러 응답하는지 확인합니다.
-    out("### 같은 API를 브라우저 없이 다시 호출")
-    out()
-    out("| # | 상태 | 크기 | 주소 | 내용 |")
-    out("|---|---|---|---|---|")
-    done = set()
-    for r in rows:
-        if "front-api" not in r["url"] or r["method"] != "GET" or r["url"] in done:
-            continue
-        if any(x in r["url"] for x in ("/user/", "/auth/")):
-            continue
-        done.add(r["url"])
-        status, body, ctype = fetch(r["url"], {"Referer": "https://fin.land.naver.com/",
-                                               "Accept": "application/json"})
-        short = urllib.parse.unquote(r["url"].split("?")[0]).replace("https://fin.land.naver.com", "")
-        out(f"| {r['i']} | {status} | {len(body)} | `{short}` | {describe(body, ctype)[:120]} |")
-        time.sleep(0.5)
+    for method, status, url in seen:
+        out(f"- {method} {status} `{urllib.parse.unquote(url).replace('https://fin.land.naver.com', '')[:200]}`")
     out()
 
 
