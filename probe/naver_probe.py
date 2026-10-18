@@ -196,9 +196,9 @@ def browser_checks(complex_no: str) -> None:
             out(f"### {page_url}")
             out()
             try:
-                resp = page.goto(page_url, wait_until="networkidle", timeout=45_000)
+                resp = page.goto(page_url, wait_until="domcontentloaded", timeout=45_000)
                 out(f"- 페이지 상태: {resp.status if resp else '응답 없음'}, 최종 주소: {page.url}")
-                page.wait_for_timeout(3000)
+                page.wait_for_timeout(8000)
                 # 매물 목록을 띄우기 위해 매물 탭으로 보이는 요소를 눌러 봅니다.
                 for label in ("매물", "단지 매물", "매매"):
                     try:
