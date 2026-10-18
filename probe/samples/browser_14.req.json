@@ -1,0 +1,18 @@
+{
+ "url": "https://fin.land.naver.com/front-api/v1/complex/pyeong/realPrice/list?complexNumber=3084&endDate=2026-10-18&pyeongTypeNumber=0&realEstateType=A01&startDate=2025-10-18&tradeType=A1",
+ "method": "GET",
+ "post": "",
+ "headers": {
+  "sec-ch-ua-platform": "\"Windows\"",
+  "referer": "https://fin.land.naver.com/map?layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYMWIC6QA&tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&center=3zhF48-2AM354&zoom=15",
+  "accept-language": "ko-KR",
+  "x-page-url": "https://fin.land.naver.com/map?layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYMWIC6QA&tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&center=3zhF48-2AM354&zoom=15",
+  "sec-ch-ua": "\"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"156\"",
+  "sec-ch-ua-mobile": "?0",
+  "baggage": "sentry-environment=real,sentry-release=property-web%402026.10.14,sentry-public_key=ec5063b7741b4a9282a85c1e2f27ab09,sentry-trace_id=c624acedf7bc456595104e8780b587b2",
+  "sentry-trace": "c624acedf7bc456595104e8780b587b2-a33fe72e7a6f45b2",
+  "x-attest": "Uk-FhQAdRztXFJL8XV2_3hs12HjmChbYm8hnoOEVxp_TEpmGPBVyxBpqZrNnIMRcvJgxT7Fxi2yWWRQfU7NLrI_fb6LwWBLPfnUZfC5cnwGbBEXy9OajGg",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+  "accept": "application/json, text/plain, */*"
+ }
+}
