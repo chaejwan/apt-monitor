@@ -1,0 +1,1 @@
+{"message":"Route GET:/front-api/v1/complex/article/list?complexNumber=3084&tradeTypes[]=A1&page=0&size=30 not found","error":"Not Found","statusCode":404}
