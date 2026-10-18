@@ -7,8 +7,10 @@ set HEADED=1
 cd /d "%~dp0.."
 call .venv\Scripts\activate.bat || goto :error
 
+rem 지난 진단이 중간에 멈춰 남은 결과 파일을 지우고 최신 코드를 받습니다.
+git checkout -q -- probe 2>nul
+git clean -fdq probe 2>nul
 git pull --rebase -q || goto :error
-if exist probe\samples rmdir /s /q probe\samples
 python probe\naver_probe.py --complex 3084 --browser || goto :error
 
 git add probe\report.md probe\samples
