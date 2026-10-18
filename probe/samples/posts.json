@@ -1,0 +1,92 @@
+[
+ {
+  "url": "https://fin.land.naver.com/front-api/v1/complex/complexClusters",
+  "body": "{\"filter\":{\"tradeTypes\":[\"A1\",\"B1\"],\"realEstateTypes\":[\"A01\",\"A04\",\"B01\"],\"roomCount\":[],\"bathRoomCount\":[],\"optionTypes\":[],\"oneRoomShapeTypes\":[],\"moveInTypes\":[],\"filtersExclusiveSpace\":false,\"floorTypes\":[],\"directionTypes\":[],\"hasArticlePhoto\":false,\"isAuthorizedByOwner\":false,\"parkingTypes\":[],\"entranceTypes\":[],\"hasArticle\":false},\"boundingBox\":{\"left\":127.10179360568259,\"right\":127.12883027255265,\"top\":37.378636717987035,\"bottom\":37.36438060471119},\"precision\":15,\"userChannelType\":\"PC\"}",
+  "headers": {
+   "sec-ch-ua-platform": "\"Windows\"",
+   "referer": "https://fin.land.naver.com/map?tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYCWDrEArnV0l12ODutYxAXSA&center=3znqmb-2ADRJg&zoom=15",
+   "accept-language": "ko-KR",
+   "x-page-url": "https://fin.land.naver.com/map?tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYCWDrEArnV0l12ODutYxAXSA&center=3znqmb-2ADRJg&zoom=15",
+   "sec-ch-ua": "\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\"",
+   "sec-ch-ua-mobile": "?0",
+   "baggage": "sentry-environment=real,sentry-release=property-web%402026.10.14,sentry-public_key=ec5063b7741b4a9282a85c1e2f27ab09,sentry-trace_id=90018519a641474c8533676bc113f8bf",
+   "sentry-trace": "90018519a641474c8533676bc113f8bf-ac09689c3b9c10d1",
+   "x-attest": "DvBar2L9fwrY2APvGD-TMpldmPqiiu9nly7ELPpVJsov_hvaKu4uiqYZ9tGRxlUwR5st6Jb0qxfNTnN3J55l1cPwZqNsAecXzIVhx469_qrhSWLVCdzhJg",
+   "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+   "accept": "application/json, text/plain, */*",
+   "content-type": "application/json"
+  }
+ },
+ {
+  "url": "https://fin.land.naver.com/front-api/v1/article/boundedArticlesCount",
+  "body": "{\"filter\":{\"tradeTypes\":[\"A1\",\"B1\"],\"realEstateTypes\":[\"A01\",\"A04\",\"B01\"],\"roomCount\":[],\"bathRoomCount\":[],\"optionTypes\":[],\"oneRoomShapeTypes\":[],\"moveInTypes\":[],\"filtersExclusiveSpace\":false,\"floorTypes\":[],\"directionTypes\":[],\"hasArticlePhoto\":false,\"isAuthorizedByOwner\":false,\"parkingTypes\":[],\"entranceTypes\":[],\"hasArticle\":false},\"boundingBox\":{\"left\":127.10179360568259,\"right\":127.12883027255265,\"top\":37.378636717987035,\"bottom\":37.36438060471119},\"precision\":15,\"userChannelType\":\"PC\"}",
+  "headers": {
+   "sec-ch-ua-platform": "\"Windows\"",
+   "referer": "https://fin.land.naver.com/map?tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYCWDrEArnV0l12ODutYxAXSA&center=3znqmb-2ADRJg&zoom=15",
+   "accept-language": "ko-KR",
+   "x-page-url": "https://fin.land.naver.com/map?tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYCWDrEArnV0l12ODutYxAXSA&center=3znqmb-2ADRJg&zoom=15",
+   "sec-ch-ua": "\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\"",
+   "sec-ch-ua-mobile": "?0",
+   "baggage": "sentry-environment=real,sentry-release=property-web%402026.10.14,sentry-public_key=ec5063b7741b4a9282a85c1e2f27ab09,sentry-trace_id=90018519a641474c8533676bc113f8bf",
+   "sentry-trace": "90018519a641474c8533676bc113f8bf-ac09689c3b9c10d1",
+   "x-attest": "JMMuus3sy7ZnwjEv5lC0yhmSx1Dzhdu74as6o-KP6KoJvnztWLc5FljsuWziyw-l10NjBg7ZX1pKvBrHiqqNwECsYtNHY7DK6ZAq9T9vw7HbcXSsbvZzvg",
+   "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+   "accept": "application/json, text/plain, */*",
+   "content-type": "application/json"
+  }
+ },
+ {
+  "url": "https://fin.land.naver.com/front-api/v1/article/map/articleClusters",
+  "body": "{\"filter\":{\"tradeTypes\":[\"A1\",\"B1\"],\"realEstateTypes\":[\"A01\",\"A04\",\"B01\"],\"roomCount\":[],\"bathRoomCount\":[],\"optionTypes\":[],\"oneRoomShapeTypes\":[],\"moveInTypes\":[],\"filtersExclusiveSpace\":false,\"floorTypes\":[],\"directionTypes\":[],\"hasArticlePhoto\":false,\"isAuthorizedByOwner\":false,\"parkingTypes\":[],\"entranceTypes\":[],\"hasArticle\":false},\"boundingBox\":{\"left\":127.10179360568259,\"right\":127.12883027255265,\"top\":37.378636717987035,\"bottom\":37.36438060471119},\"precision\":15,\"userChannelType\":\"PC\"}",
+  "headers": {
+   "sec-ch-ua-platform": "\"Windows\"",
+   "referer": "https://fin.land.naver.com/map?tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYCWDrEArnV0l12ODutYxAXSA&center=3znqmb-2ADRJg&zoom=15",
+   "accept-language": "ko-KR",
+   "x-page-url": "https://fin.land.naver.com/map?tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYCWDrEArnV0l12ODutYxAXSA&center=3znqmb-2ADRJg&zoom=15",
+   "sec-ch-ua": "\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\"",
+   "sec-ch-ua-mobile": "?0",
+   "baggage": "sentry-environment=real,sentry-release=property-web%402026.10.14,sentry-public_key=ec5063b7741b4a9282a85c1e2f27ab09,sentry-trace_id=90018519a641474c8533676bc113f8bf",
+   "sentry-trace": "90018519a641474c8533676bc113f8bf-ac09689c3b9c10d1",
+   "x-attest": "MMMs5ulp-U74fVIxo5vxwzS2Hazo_S4wT8t0W6MwaqMcF_HDEMhHSe9qNb3eNT6syqBP6O-lA008HGoelnqnsPkn60MeTnIVjf5UMwrgZa6h7X00AH_wIw",
+   "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+   "accept": "application/json, text/plain, */*",
+   "content-type": "application/json"
+  }
+ },
+ {
+  "url": "https://fin.land.naver.com/front-api/v1/preSale/pinExposure",
+  "body": "{\"boundingBox\":{\"left\":127.10179360568259,\"right\":127.12883027255265,\"top\":37.378636717987035,\"bottom\":37.36438060471119},\"userChannelType\":\"PC\"}",
+  "headers": {
+   "sec-ch-ua-platform": "\"Windows\"",
+   "referer": "https://fin.land.naver.com/map?tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYCWDrEArnV0l12ODutYxAXSA&center=3znqmb-2ADRJg&zoom=15",
+   "accept-language": "ko-KR",
+   "x-page-url": "https://fin.land.naver.com/map?tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZwwRBgDsmJBEQhJdYCWDrEArnV0l12ODutYxAXSA&center=3znqmb-2ADRJg&zoom=15",
+   "sec-ch-ua": "\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\"",
+   "sec-ch-ua-mobile": "?0",
+   "baggage": "sentry-environment=real,sentry-release=property-web%402026.10.14,sentry-public_key=ec5063b7741b4a9282a85c1e2f27ab09,sentry-trace_id=90018519a641474c8533676bc113f8bf",
+   "sentry-trace": "90018519a641474c8533676bc113f8bf-ac09689c3b9c10d1",
+   "x-attest": "qKNqeL8EVfiLs48lKPRQ5JslU8sCLsXAIv_uSTpgP40u6Wz-tPfFipOXYp31MqTM6j-24yizfXmU1sR6SwL6Ncnu6XK3nf2shohm2gGkIqi1gHkV7G1ibQ",
+   "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+   "accept": "application/json, text/plain, */*",
+   "content-type": "application/json"
+  }
+ },
+ {
+  "url": "https://fin.land.naver.com/front-api/v1/complex/article/list",
+  "body": "{\"size\":30,\"complexNumber\":3084,\"tradeTypes\":[\"A1\"],\"pyeongTypes\":[],\"dongNumbers\":[],\"userChannelType\":\"PC\",\"articleSortType\":\"RANKING_DESC\",\"lastInfo\":[]}",
+  "headers": {
+   "sec-ch-ua-platform": "\"Windows\"",
+   "referer": "https://fin.land.naver.com/map?center=3znqmb-2ADRJg&zoom=15&tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZww9IhATYq2urv1YAKg0JmAnmiwqwAQQCMYCWDrEArnQB2JdQNYIjovLDEAXSA",
+   "accept-language": "ko-KR",
+   "x-page-url": "https://fin.land.naver.com/map?center=3znqmb-2ADRJg&zoom=15&tradeTypes=A1-B1&realEstateTypes=A01-A04-B01&layer=NobwRAlgJmBcYGMD2BbADgGwKYA8D6UWALgIYQZgA0YaJATiSgM5zjLrY4CSMsAzAAYAHABYAvtSZZ6CABYAFeoxaxwpAEZww9IhATYq2urv1YAKg0JmAnmiwqwAQQCMYCWDrEArnQB2JdQNYIjovLDEAXSA",
+   "sec-ch-ua": "\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\"",
+   "sec-ch-ua-mobile": "?0",
+   "baggage": "sentry-environment=real,sentry-release=property-web%402026.10.14,sentry-public_key=ec5063b7741b4a9282a85c1e2f27ab09,sentry-trace_id=655551fab6634cf1b5a1c265073d9ce2",
+   "sentry-trace": "655551fab6634cf1b5a1c265073d9ce2-8a280413321d71a2",
+   "x-attest": "MChQxQYChzTLs1HKqvIkA816Pd_doB0r25Vy3ePkRKpHpgSlIO0fcLW6V4mB3ghG3JcA0Hol3OedU7bstn-CCkuTsZ4YjBvwcf00cIyaZZ7Qs4barl8DbQ",
+   "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+   "accept": "application/json, text/plain, */*",
+   "content-type": "application/json"
+  }
+ }
+]
