@@ -221,6 +221,7 @@ def main() -> int:
     ap.add_argument("--keyword", required=True, help="단지명 (예: 파크타운)")
     ap.add_argument("--address", default="", help="동 이름 (예: 수내동) — 같은 이름 단지 구분용")
     ap.add_argument("--zigbang", action="store_true", help="직방 단지 페이지도 열어 보기")
+    ap.add_argument("--kb-ids", default="", help="확인할 KB부동산 단지 id 목록 (쉼표 구분)")
     args = ap.parse_args()
 
     out("# 대체 출처 진단 결과")
@@ -255,20 +256,35 @@ def main() -> int:
                 explore(ctx, f"직방_{d['name']}", f"https://www.zigbang.com/home/apt/danjis/{d['id']}",
                         args.keyword, "", [], tabs=tabs, search=False)
 
-        # KB부동산: 단지 좌표로 지도를 열어 단지 id를 찾고, 단지 페이지마다 매물 탭을 엽니다.
-        if center and center[0]:
+        # KB부동산: 단지 id를 직접 받았으면 그 페이지들로, 아니면 단지 좌표로 지도를 열어 id를 찾습니다.
+        kb_ids: dict[str, str] = {}
+        for kb_id in [x.strip() for x in args.kb_ids.split(",") if x.strip()]:
+            # 페이지 제목이 자바스크립트로 채워질 수 있어 브라우저로 열어 확인합니다.
+            page = ctx.new_page()
+            try:
+                page.goto(f"https://kbland.kr/c/{kb_id}", wait_until="domcontentloaded", timeout=30_000)
+                page.wait_for_timeout(3000)
+                title = page.title()
+            except Exception as e:
+                title = f"조회 실패: {str(e)[:80]}"
+            page.close()
+            out(f"- KB 단지 {kb_id}: {title[:60]}")
+            if args.keyword in title:
+                kb_ids[kb_id] = title.split("'")[1] if "'" in title else title
+        out()
+        if not kb_ids and center and center[0]:
             seen = explore(ctx, "KB부동산_지도", f"https://kbland.kr/map?xy={center[0]},{center[1]},18",
                            args.keyword, "", [], search=False)
-            kb_ids = find_ids(seen, args.keyword, ("단지기본일련번호", "complexId", "단지일련번호"))
-            out(f"KB부동산 지도에서 찾은 단지: {kb_ids or '없음'}")
-            out()
-            kb_tabs = [re.compile(r"^매매\s*\d+$"), re.compile(r"^전세\s*\d+$"),
-                       re.compile(r"^월세\s*\d+$"), "동별매물"]
-            for kb_id, kb_name in list(kb_ids.items())[:4]:
-                if not kb_name.startswith(args.keyword):  # '도덕파크타운' 같은 다른 단지는 건너뜀
-                    continue
-                explore(ctx, f"KB부동산_{kb_name}", f"https://kbland.kr/c/{kb_id}",
-                        args.keyword, "", [], tabs=kb_tabs, search=False)
+            kb_ids = {k: v for k, v in find_ids(seen, args.keyword,
+                                                 ("단지기본일련번호", "complexId", "단지일련번호")).items()
+                      if v.startswith(args.keyword)}  # '도덕파크타운' 같은 다른 단지는 건너뜀
+        out(f"매물을 확인할 KB 단지: {kb_ids or '없음'}")
+        out()
+        kb_tabs = [re.compile(r"^매매\s*\d+$"), re.compile(r"^전세\s*\d+$"),
+                   re.compile(r"^월세\s*\d+$"), "동별매물"]
+        for kb_id, kb_name in list(kb_ids.items())[:4]:
+            explore(ctx, f"KB부동산_{kb_name}", f"https://kbland.kr/c/{kb_id}",
+                    args.keyword, "", [], tabs=kb_tabs, search=False)
         browser.close()
 
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
