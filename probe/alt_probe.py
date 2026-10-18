@@ -124,6 +124,7 @@ def explore(ctx, name: str, start_url: str, keyword: str, address: str, direct_u
         seen.append({"url": resp.url, "status": resp.status, "method": resp.request.method,
                      "post": (resp.request.post_data or "")[:300], "body": body})
 
+    SAMPLES.mkdir(parents=True, exist_ok=True)
     page = ctx.new_page()
     page.on("response", on_response)
     steps = []
@@ -142,8 +143,16 @@ def explore(ctx, name: str, start_url: str, keyword: str, address: str, direct_u
             page.wait_for_timeout(4000)
             steps.append(f"직접 이동 {url} → 상태 {r.status if r else '없음'}, 최종 {page.url[:90]}")
         for t in tabs or []:
+            label = getattr(t, "pattern", t)
             hit = click_text(page, [t])
-            steps.append(f"'{t}' 클릭" if hit else f"'{t}' 를 찾지 못함")
+            page.wait_for_timeout(2000)
+            login = page.get_by_text("로그인 하면").or_(page.get_by_text("로그인이 필요")).count() > 0
+            steps.append((f"'{label}' 클릭" if hit else f"'{label}' 를 찾지 못함")
+                         + (" → 로그인 창이 뜸" if login else ""))
+            if login:
+                page.screenshot(path=str(SAMPLES / f"{name}_로그인.png"))
+                page.keyboard.press("Escape")
+                page.wait_for_timeout(800)
             # 목록이 스크롤로 더 불러와지는 사이트를 위해 아래로 몇 번 내립니다.
             for _ in range(3):
                 page.mouse.wheel(0, 1500)
@@ -169,7 +178,8 @@ def explore(ctx, name: str, start_url: str, keyword: str, address: str, direct_u
         desc = summarize(r["body"])
         sample = ""
         text = r["body"][:400_000].decode("utf-8", "replace")
-        if keyword.replace(" ", "") in text.replace(" ", "") or LISTING_HINTS.search(desc):
+        if (keyword.replace(" ", "") in text.replace(" ", "") or LISTING_HINTS.search(desc)
+                or "propList" in r["url"] or "/items" in r["url"]):
             fname = f"{name}_{i}.json"
             (SAMPLES / fname).write_text(
                 json.dumps({"url": r["url"], "method": r["method"], "post": r["post"]}, ensure_ascii=False)
@@ -210,6 +220,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--keyword", required=True, help="단지명 (예: 파크타운)")
     ap.add_argument("--address", default="", help="동 이름 (예: 수내동) — 같은 이름 단지 구분용")
+    ap.add_argument("--zigbang", action="store_true", help="직방 단지 페이지도 열어 보기")
     args = ap.parse_args()
 
     out("# 대체 출처 진단 결과")
@@ -239,8 +250,10 @@ def main() -> int:
         out()
         for d in danjis[:4]:
             center = center or (d.get("lat"), d.get("lng"))
-            explore(ctx, f"직방_{d['name']}", f"https://www.zigbang.com/home/apt/danjis/{d['id']}",
-                    args.keyword, "", [], tabs=tabs, search=False)
+        if args.zigbang:
+            for d in danjis[:4]:
+                explore(ctx, f"직방_{d['name']}", f"https://www.zigbang.com/home/apt/danjis/{d['id']}",
+                        args.keyword, "", [], tabs=tabs, search=False)
 
         # KB부동산: 단지 좌표로 지도를 열어 단지 id를 찾고, 단지 페이지마다 매물 탭을 엽니다.
         if center and center[0]:
@@ -249,9 +262,13 @@ def main() -> int:
             kb_ids = find_ids(seen, args.keyword, ("단지기본일련번호", "complexId", "단지일련번호"))
             out(f"KB부동산 지도에서 찾은 단지: {kb_ids or '없음'}")
             out()
+            kb_tabs = [re.compile(r"^매매\s*\d+$"), re.compile(r"^전세\s*\d+$"),
+                       re.compile(r"^월세\s*\d+$"), "동별매물"]
             for kb_id, kb_name in list(kb_ids.items())[:4]:
+                if not kb_name.startswith(args.keyword):  # '도덕파크타운' 같은 다른 단지는 건너뜀
+                    continue
                 explore(ctx, f"KB부동산_{kb_name}", f"https://kbland.kr/c/{kb_id}",
-                        args.keyword, "", [], tabs=tabs, search=False)
+                        args.keyword, "", [], tabs=kb_tabs, search=False)
         browser.close()
 
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
