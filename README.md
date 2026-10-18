@@ -19,8 +19,22 @@
    ```
 4. 탐색기에서 `apt-monitor\laptop\setup.bat`을 더블클릭합니다. 파이썬 패키지와 브라우저를 설치합니다.
 
-## 현재 단계: 노트북에서 네이버 진단
+## 매물 수집 (1단계)
 
-`apt-monitor\laptop\probe.bat`을 더블클릭하면 노트북에서 네이버부동산 API를 진단하고
-결과를 [probe/report.md](probe/report.md)로 GitHub에 올립니다.
-처음 push할 때 GitHub 로그인 창이 뜨면 로그인해 주세요.
+1. **텔레그램 알림 설정** — `laptop\.env.example`을 같은 폴더에 `.env`로 복사하고 봇 토큰과 chat id를 채웁니다.
+2. **관심 조건** — [config/watchlists.json](config/watchlists.json)에 단지·평형·거래유형·가격·층·향·동·키워드를 적습니다.
+   GitHub 웹에서 연필 아이콘으로 고치면 노트북이 다음 수집 때 받아 갑니다.
+3. **첫 수집** — `laptop\collect.bat`을 더블클릭합니다. 첫 수집은 기준만 잡고 알림을 보내지 않습니다.
+4. **자동 실행 등록** — `laptop\register_task.bat`을 더블클릭하면 매일 8:07·13:07·19:07에 수집합니다.
+   노트북이 꺼져 있었으면 켜진 뒤 바로 실행합니다. 기록은 `laptop\logs\collect.log`에 남습니다.
+
+수집 결과는 저장소에 남습니다.
+
+| 파일 | 내용 |
+|---|---|
+| `data/complexes/<단지번호>.json` | 단지 정보, 평형·동 목록 (7일마다 갱신) |
+| `data/listings/<단지번호>.json` | 집별 상태: 최초·최근 확인 시각, 가격 이력, 진행/삭제 |
+| `data/events/YYYY-MM.jsonl` | 변화 이력: 신규·삭제·재등록·가격인상·가격인하·조건진입·조건이탈 |
+| `data/status.json` | 마지막 수집 결과 요약 |
+
+진단 도구(`laptop\probe.bat`, `probe/`)는 네이버 화면이 바뀌어 수집이 깨졌을 때 원인을 찾는 데 씁니다.

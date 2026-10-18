@@ -11,6 +11,13 @@
 - 따라서 **네이버 매물 수집은 노트북(가정용 국내 IP)에서 Windows 작업 스케줄러로 실행해 결과를 push**한다.
   노트북이 꺼져 있는 동안은 수집이 비며, 켜지면 놓친 실행을 바로 한다.
 - 실거래 수집, 화면(Pages), 이력 보관은 계획대로 GitHub에서 한다.
+- 노트북에서도 브라우저 없이 부르면 429, 자동화 브라우저는 404 페이지로 돌려보낸다.
+  **설치된 Chrome을 자동화 표시 없이 띄워 fin.land 페이지를 연 뒤, 그 페이지 안에서 `fetch`로 API를 부른다.**
+- 확인된 API (`https://fin.land.naver.com/front-api/v1/...`, 로그인 불필요):
+  - `GET complex?complexNumber=` 단지 정보 · `complex/pyeongList` 평형 · `complex/buildingList` 동·좌표 · `complex/article/stats` 거래유형별 매물 수
+  - `POST complex/article/list` 매물 목록. 본문 `{"size":30,"complexNumber":3084,"tradeTypes":["A1"],"pyeongTypes":[],"dongNumbers":[],"userChannelType":"PC","articleSortType":"RANKING_DESC","lastInfo":[]}`,
+    응답의 `lastInfo`를 넣어 다음 페이지. 항목마다 동·층·향·평형·호가·특징·확인일·중개사·좌표가 있고,
+    같은 집을 여러 중개사가 올린 매물은 `duplicatedArticleInfo`로 묶여 온다. 입주가능일은 목록에 없다.
 
 ## 1. 전체 구조
 

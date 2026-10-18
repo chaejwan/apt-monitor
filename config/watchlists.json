@@ -1,0 +1,30 @@
+{
+ "_help": {
+  "complexNo": "네이버 단지번호 (예전 네이버부동산 주소 /complexes/ 뒤 숫자)",
+  "tradeTypes": "매매 / 전세 / 월세 중 고르기. 비우면 전부",
+  "areas": "평형 이름 (data/complexes/<단지번호>.json 의 pyeongList[].name, 예: 105, 124B). 비우면 전부",
+  "price": "거래유형별 [최소, 최대] 만원. 매매는 매매가, 전세·월세는 보증금. null 은 제한 없음",
+  "rentMax": "월세 상한 (만원)",
+  "floor": "excludeLow: 이 층 이하 제외, excludeTop: 꼭대기층 제외",
+  "directions": "남향, 남동향, 남서향, 동향, 서향, 북향, 북동향, 북서향. 비우면 전부",
+  "dongs": "동 이름 (예: 107). 비우면 전부",
+  "keywords": "매물 특징 문구에 include 중 하나라도 있어야 하고, exclude 는 하나도 없어야 함",
+  "notify": "텔레그램 알림 여부"
+ },
+ "watches": [
+  {
+   "id": "w1",
+   "name": "파크타운 전체",
+   "complexNo": "3084",
+   "tradeTypes": [],
+   "areas": [],
+   "price": {},
+   "rentMax": null,
+   "floor": {"excludeLow": 0, "excludeTop": false},
+   "directions": [],
+   "dongs": [],
+   "keywords": {"include": [], "exclude": []},
+   "notify": true
+  }
+ ]
+}
