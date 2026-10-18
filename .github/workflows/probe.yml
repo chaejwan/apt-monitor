@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: "진단 대상 — naver: 네이버부동산 API / alt: KB부동산·직방·구 네이버 부동산"
+        description: "진단 대상 — naver: 네이버부동산 API / alt: KB부동산·직방 매물"
         type: choice
         options: [alt, naver]
         default: alt
@@ -64,7 +64,7 @@ jobs:
         if: ${{ inputs.target == 'alt' }}
         run: |
           rm -rf probe/alt_samples
-          python3 probe/alt_probe.py --keyword "${{ inputs.keyword }}" --address "${{ inputs.address }}" --complex "${{ inputs.complex_no }}"
+          python3 probe/alt_probe.py --keyword "${{ inputs.keyword }}" --address "${{ inputs.address }}"
 
       - name: 결과 기록
         run: |

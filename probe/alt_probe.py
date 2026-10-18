@@ -1,11 +1,10 @@
-"""네이버 외 매물 출처(KB부동산, 직방)와 구 네이버 부동산(land.naver.com)이
-GitHub Actions 환경에서 매물을 주는지 진단합니다.
+"""네이버 외 매물 출처(KB부동산, 직방)가 GitHub Actions 환경에서 매물을 주는지 진단합니다.
 
-브라우저로 각 사이트를 열어 단지를 검색하고, 그 과정에서 오간 JSON 응답을 기록합니다.
+브라우저로 각 사이트의 단지 페이지를 열어 매물 탭을 누르고, 그 과정에서 오간 JSON 응답을 기록합니다.
 결과는 probe/alt_report.md, 응답 원문은 probe/alt_samples/ 에 저장합니다.
 
 사용법:
-    python probe/alt_probe.py --keyword 파크타운 --address 수내동 --complex 3084
+    python probe/alt_probe.py --keyword 파크타운 --address 수내동
 """
 
 import argparse
@@ -109,7 +108,8 @@ def click_text(page, texts: list[str], wait: int = 3000) -> str | None:
     return None
 
 
-def explore(ctx, name: str, start_url: str, keyword: str, address: str, direct_urls: list[str]) -> None:
+def explore(ctx, name: str, start_url: str, keyword: str, address: str, direct_urls: list[str],
+            tabs: list[str] | None = None, search: bool = True) -> list[dict]:
     out(f"## {name}")
     out()
     seen: list[dict] = []
@@ -131,7 +131,7 @@ def explore(ctx, name: str, start_url: str, keyword: str, address: str, direct_u
         resp = page.goto(start_url, wait_until="domcontentloaded", timeout=40_000)
         page.wait_for_timeout(4000)
         steps.append(f"시작 페이지 {start_url} → 상태 {resp.status if resp else '없음'}")
-        if keyword:
+        if keyword and search:
             steps.append(try_search(page, f"{address} {keyword}".strip()))
             hit = click_text(page, [f"{keyword}", keyword.replace(" ", "")])
             steps.append(f"검색 결과 '{hit}' 클릭" if hit else "검색 결과에서 단지를 찾지 못함")
@@ -141,6 +141,13 @@ def explore(ctx, name: str, start_url: str, keyword: str, address: str, direct_u
             r = page.goto(url, wait_until="domcontentloaded", timeout=30_000)
             page.wait_for_timeout(4000)
             steps.append(f"직접 이동 {url} → 상태 {r.status if r else '없음'}, 최종 {page.url[:90]}")
+        for t in tabs or []:
+            hit = click_text(page, [t])
+            steps.append(f"'{t}' 클릭" if hit else f"'{t}' 를 찾지 못함")
+            # 목록이 스크롤로 더 불러와지는 사이트를 위해 아래로 몇 번 내립니다.
+            for _ in range(3):
+                page.mouse.wheel(0, 1500)
+                page.wait_for_timeout(800)
         steps.append(f"마지막 주소: {page.url}")
         title = page.title()
         steps.append(f"페이지 제목: {title}")
@@ -172,13 +179,37 @@ def explore(ctx, name: str, start_url: str, keyword: str, address: str, direct_u
         out(f"| {r['method']} | {r['status']} | `{short}` | {desc[:160]} | {sample} |")
     out()
     page.close()
+    return seen
+
+
+def find_ids(seen: list[dict], keyword: str, id_keys: tuple[str, ...]) -> dict[str, str]:
+    """수집한 JSON에서 이름에 키워드가 들어간 항목의 id를 찾습니다."""
+    found: dict[str, str] = {}
+
+    def walk(node):
+        if isinstance(node, dict):
+            name = next((v for v in node.values() if isinstance(v, str) and keyword in v), None)
+            ident = next((node[k] for k in id_keys if node.get(k)), None)
+            if name and ident:
+                found.setdefault(str(ident), name)
+            for v in node.values():
+                walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+
+    for r in seen:
+        try:
+            walk(json.loads(r["body"]))
+        except ValueError:
+            continue
+    return found
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--keyword", required=True, help="단지명 (예: 파크타운)")
     ap.add_argument("--address", default="", help="동 이름 (예: 수내동) — 같은 이름 단지 구분용")
-    ap.add_argument("--complex", default="", help="네이버 단지번호 (구 land.naver.com 확인용)")
     args = ap.parse_args()
 
     out("# 대체 출처 진단 결과")
@@ -189,19 +220,38 @@ def main() -> int:
 
     from playwright.sync_api import sync_playwright
 
-    old_land = []
-    if args.complex:
-        old_land = [
-            f"https://land.naver.com/complex/complexDetail?hscpNo={args.complex}",
-            f"https://land.naver.com/article/complexInfo.naver?hscpNo={args.complex}",
-        ]
+    tabs = ["매물", "매매", "전세", "월세"]
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=os.environ.get("CHROMIUM_PATH") or None)
         ctx = browser.new_context(user_agent=UA, locale="ko-KR", timezone_id="Asia/Seoul",
                                   viewport={"width": 1400, "height": 900})
-        explore(ctx, "KB부동산", "https://kbland.kr/", args.keyword, args.address, [])
-        explore(ctx, "직방", "https://www.zigbang.com/home/apt/map", args.keyword, args.address, [])
-        explore(ctx, "land.naver.com", "https://land.naver.com/", "", "", old_land)
+
+        # 직방: 검색 API로 단지를 찾고 단지 페이지마다 매물 탭을 엽니다.
+        q = urllib.parse.quote(f"{args.address} {args.keyword}".strip())
+        danjis, center = [], None
+        try:
+            resp = ctx.request.get(f"https://apis.zigbang.com/v2/search?leaseYn=N&os=web&q={q}&serviceType=아파트")
+            danjis = [it for it in resp.json().get("items", [])
+                      if it.get("type") == "apartment" and args.keyword in it.get("name", "")]
+        except Exception as e:
+            out(f"직방 검색 실패: {e}")
+        out(f"직방 검색으로 찾은 단지: {[(d['id'], d['name']) for d in danjis]}")
+        out()
+        for d in danjis[:4]:
+            center = center or (d.get("lat"), d.get("lng"))
+            explore(ctx, f"직방_{d['name']}", f"https://www.zigbang.com/home/apt/danjis/{d['id']}",
+                    args.keyword, "", [], tabs=tabs, search=False)
+
+        # KB부동산: 단지 좌표로 지도를 열어 단지 id를 찾고, 단지 페이지마다 매물 탭을 엽니다.
+        if center and center[0]:
+            seen = explore(ctx, "KB부동산_지도", f"https://kbland.kr/map?xy={center[0]},{center[1]},18",
+                           args.keyword, "", [], search=False)
+            kb_ids = find_ids(seen, args.keyword, ("단지기본일련번호", "complexId", "단지일련번호"))
+            out(f"KB부동산 지도에서 찾은 단지: {kb_ids or '없음'}")
+            out()
+            for kb_id, kb_name in list(kb_ids.items())[:4]:
+                explore(ctx, f"KB부동산_{kb_name}", f"https://kbland.kr/c/{kb_id}",
+                        args.keyword, "", [], tabs=tabs, search=False)
         browser.close()
 
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
