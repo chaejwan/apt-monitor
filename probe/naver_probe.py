@@ -74,6 +74,43 @@ def describe(body: bytes, ctype: str) -> str:
     return f"text: {text[:120]}"
 
 
+def reach_checks() -> None:
+    out("## 0. 사이트별 접속 여부")
+    out()
+    out("네이버 전체가 막혔는지 부동산만 막혔는지, 대체 출처는 열리는지 확인합니다.")
+    out()
+    targets = [
+        ("네이버 메인", "https://www.naver.com/"),
+        ("네이버 검색", "https://search.naver.com/search.naver?query=%ED%8C%8C%ED%81%AC%ED%83%80%EC%9A%B4"),
+        ("네이버 지도", "https://map.naver.com/"),
+        ("land.naver.com", "https://land.naver.com/"),
+        ("new.land.naver.com", "https://new.land.naver.com/"),
+        ("fin.land.naver.com", "https://fin.land.naver.com/"),
+        ("KB부동산", "https://kbland.kr/"),
+        ("KB부동산 API", "https://api.kbland.kr/"),
+        ("직방", "https://www.zigbang.com/"),
+        ("직방 API", "https://apis.zigbang.com/"),
+        ("호갱노노", "https://hogangnono.com/"),
+        ("아실", "https://asil.kr/"),
+        ("공공데이터포털 API", "https://apis.data.go.kr/"),
+        ("카카오 API", "https://dapi.kakao.com/"),
+    ]
+    out("| 사이트 | 상태 | 걸린 시간 | 비고 |")
+    out("|---|---|---|---|")
+    for name, url in targets:
+        start = time.time()
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        try:
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                status, note = resp.status, resp.geturl()[:60]
+        except urllib.error.HTTPError as e:
+            status, note = e.code, "HTTP 오류(서버는 응답함)"
+        except Exception as e:
+            status, note = 0, str(e)[:60]
+        out(f"| {name} | {status} | {time.time() - start:.1f}s | {note} |")
+    out()
+
+
 def http_checks(complex_no: str) -> None:
     out("## 1. HTTP 직접 요청")
     out()
@@ -225,6 +262,7 @@ def main() -> int:
         pass
     out()
 
+    reach_checks()
     http_checks(args.complex)
     if args.browser:
         try:
