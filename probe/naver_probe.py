@@ -69,7 +69,9 @@ def describe(body: bytes, ctype: str) -> str:
                 if isinstance(data.get(k), list):
                     extra = f", {k} {len(data[k])}건"
             return f"keys={keys}{extra}"
-        return f"list {len(data)}건"
+        if isinstance(data, list):
+            return f"list {len(data)}건"
+        return f"JSON 값: {str(data)[:40]}"
     text = body[:200].decode("utf-8", "replace").replace("\n", " ")
     return f"text: {text[:120]}"
 
@@ -149,9 +151,12 @@ def http_checks(complex_no: str) -> None:
     out("| 확인 항목 | 상태 | 크기 | 내용 | 원문 |")
     out("|---|---|---|---|---|")
     for name, url, headers, cached in checks:
-        status, body, ctype = cached or fetch(url, headers)
-        sample = save_sample(f"http_{name}.txt", body) if body else ""
-        out(f"| {name} | {status} | {len(body)} | {describe(body, ctype)} | {sample} |")
+        try:
+            status, body, ctype = cached or fetch(url, headers)
+            sample = save_sample(f"http_{name}.txt", body) if body else ""
+            out(f"| {name} | {status} | {len(body)} | {describe(body, ctype)} | {sample} |")
+        except Exception as e:
+            out(f"| {name} | 오류 | - | {str(e)[:80]} | |")
         time.sleep(1.5)
     out()
     out(f"- 페이지 HTML에서 찾은 JWT 토큰: {'있음' if token else '없음'}")
@@ -163,12 +168,11 @@ def browser_checks(complex_no: str) -> None:
     out()
     from playwright.sync_api import sync_playwright
 
-    pages = [
-        f"https://new.land.naver.com/complexes/{complex_no}",
-        f"https://fin.land.naver.com/complexes/{complex_no}",
-    ]
+    # new.land 는 /404 로 넘어가므로 현재 서비스인 fin.land 만 확인합니다.
+    pages = [f"https://fin.land.naver.com/complexes/{complex_no}"]
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(executable_path=os.environ.get("CHROMIUM_PATH") or None,
+                                    headless=os.environ.get("HEADED") != "1")
         ctx = browser.new_context(user_agent=UA, locale="ko-KR", timezone_id="Asia/Seoul")
         for page_url in pages:
             seen: list[dict] = []
@@ -187,7 +191,9 @@ def browser_checks(complex_no: str) -> None:
                     body = resp.body()
                 except Exception:
                     body = b""
-                seen.append({"url": resp.url, "status": resp.status, "method": resp.request.method,
+                req = resp.request
+                seen.append({"url": resp.url, "status": resp.status, "method": req.method,
+                             "post": (req.post_data or "")[:2000], "headers": dict(req.headers),
                              "size": len(body), "desc": describe(body, ctype), "body": body})
 
             page = ctx.new_page()
@@ -199,14 +205,21 @@ def browser_checks(complex_no: str) -> None:
                 resp = page.goto(page_url, wait_until="domcontentloaded", timeout=45_000)
                 out(f"- 페이지 상태: {resp.status if resp else '응답 없음'}, 최종 주소: {page.url}")
                 page.wait_for_timeout(8000)
-                # 매물 목록을 띄우기 위해 매물 탭으로 보이는 요소를 눌러 봅니다.
-                for label in ("매물", "단지 매물", "매매"):
+                # 매물 목록을 띄우기 위해 매물 탭을 누르고, 목록을 아래로 내려 다음 페이지를 불러옵니다.
+                for label in ("매물", "단지 매물"):
                     try:
-                        page.get_by_text(label, exact=True).first.click(timeout=2000)
-                        page.wait_for_timeout(2500)
+                        page.get_by_text(label, exact=True).first.click(timeout=3000)
+                        out(f"- '{label}' 탭 클릭")
+                        page.wait_for_timeout(4000)
                         break
                     except Exception:
                         continue
+                page.mouse.move(290, 600)
+                for _ in range(6):
+                    page.mouse.wheel(0, 2000)
+                    page.wait_for_timeout(1200)
+                SAMPLES.mkdir(parents=True, exist_ok=True)
+                page.screenshot(path=str(SAMPLES / "browser_fin.land.png"))
             except Exception as e:
                 out(f"- 페이지 로딩 실패: {e}")
             out(f"- Authorization 헤더를 쓴 요청: {sorted(auth_headers) or '없음'}")
@@ -216,9 +229,13 @@ def browser_checks(complex_no: str) -> None:
             for i, r in enumerate(seen):
                 short = r["url"].split("?")[0]
                 out(f"| {r['method']} | {r['status']} | {r['size']} | `{short}` | {r['desc']} |")
-                if r["size"] and re.search(r"article|complex|price|deal", r["url"], re.I):
-                    save_sample(f"browser_{urllib.parse.urlparse(page_url).netloc}_{i}.json", r["body"])
-                    (SAMPLES / f"browser_{urllib.parse.urlparse(page_url).netloc}_{i}.url").write_text(r["url"])
+                # 네이버 부동산 응답은 모두 원문과 요청 정보(주소·방식·본문·헤더)를 남깁니다.
+                if r["size"] and "land.naver.com" in r["url"]:
+                    save_sample(f"browser_fin.land_{i}.json", r["body"])
+                    headers = {k: v for k, v in r["headers"].items() if k.lower() not in ("cookie",)}
+                    (SAMPLES / f"browser_fin.land_{i}.req.json").write_text(json.dumps(
+                        {"url": r["url"], "method": r["method"], "post": r["post"], "headers": headers},
+                        ensure_ascii=False, indent=1), encoding="utf-8")
             out()
             page.close()
         browser.close()
@@ -263,7 +280,11 @@ def main() -> int:
     out()
 
     reach_checks()
-    http_checks(args.complex)
+    try:
+        http_checks(args.complex)
+    except Exception as e:
+        out(f"HTTP 진단 실패: {e}")
+        out()
     if args.browser:
         try:
             browser_checks(args.complex)

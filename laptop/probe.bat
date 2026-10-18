@@ -2,6 +2,8 @@
 rem 노트북(국내 IP)에서 네이버부동산 API가 어떻게 응답하는지 진단하고, 결과를 GitHub에 올립니다.
 chcp 65001 >nul
 set PYTHONIOENCODING=utf-8
+rem 브라우저 창을 띄워 실제 사람이 보는 것과 같은 화면으로 확인합니다.
+set HEADED=1
 cd /d "%~dp0.."
 call .venv\Scripts\activate.bat || goto :error
 
