@@ -1,8 +1,29 @@
 # 진단 결과
 
-- 실행 시각: 2026-10-18 10:57 KST
+- 실행 시각: 2026-10-18 11:19 KST
 - 단지번호: 3084
-- 실행 환경 IP: {"ip":"128.24.161.90"}
+- 실행 환경 IP: {"ip":"64.236.176.195"}
+
+## 0. 사이트별 접속 여부
+
+네이버 전체가 막혔는지 부동산만 막혔는지, 대체 출처는 열리는지 확인합니다.
+
+| 사이트 | 상태 | 걸린 시간 | 비고 |
+|---|---|---|---|
+| 네이버 메인 | 200 | 0.8s | https://www.naver.com/ |
+| 네이버 검색 | 403 | 1.0s | HTTP 오류(서버는 응답함) |
+| 네이버 지도 | 200 | 1.7s | https://map.naver.com/p/ |
+| land.naver.com | 200 | 1.1s | https://land.naver.com/ |
+| new.land.naver.com | 0 | 12.9s | The read operation timed out |
+| fin.land.naver.com | 0 | 12.9s | The read operation timed out |
+| KB부동산 | 200 | 1.1s | https://kbland.kr/ |
+| KB부동산 API | 404 | 1.1s | HTTP 오류(서버는 응답함) |
+| 직방 | 200 | 0.5s | https://www.zigbang.com/ |
+| 직방 API | 403 | 0.3s | HTTP 오류(서버는 응답함) |
+| 호갱노노 | 200 | 0.6s | https://hogangnono.com/ |
+| 아실 | 200 | 2.1s | https://asil.kr/asil/index.jsp |
+| 공공데이터포털 API | 400 | 1.0s | HTTP 오류(서버는 응답함) |
+| 카카오 API | 404 | 1.0s | HTTP 오류(서버는 응답함) |
 
 ## 1. HTTP 직접 요청
 
